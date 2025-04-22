@@ -294,6 +294,10 @@ document.addEventListener('pointerlockchange', () => {
 // Mouse look sensitivity
 const mouseSensitivity = 0.002;
 
+// Create raycaster for clue targeting
+const raycaster = new THREE.Raycaster();
+const rayDirection = new THREE.Vector3();
+
 // Track camera rotation state
 const rotation = {
     x: 0, // pitch (up/down)
@@ -318,6 +322,67 @@ function updateCameraRotation() {
         // Reset deltas
         mouse.deltaX = 0;
         mouse.deltaY = 0;
+    }
+}
+
+// Array to store intersections
+const intersects = [];
+
+// Function to update raycaster and perform raycast
+function updateRaycaster() {
+    // Get camera direction
+    camera.getWorldDirection(rayDirection);
+    
+    // Set raycaster origin and direction
+    raycaster.set(camera.position, rayDirection);
+    
+    // Clear previous results
+    intersects.length = 0;
+    
+    // Perform raycast
+    raycaster.intersectObjects(scene.children, true, intersects);
+}
+
+// Track clue targeting state
+let isClueTargeted = false;
+
+// Function to check clue intersection
+function checkClueIntersection() {
+    // Previous targeting state
+    const wasTargeted = isClueTargeted;
+    
+    // Reset targeting state
+    isClueTargeted = false;
+    
+    // Check each intersection
+    for (const intersection of intersects) {
+        // Check if the intersected object is our clue
+        if (intersection.object === clueObject || 
+            (intersection.object.parent && intersection.object.parent.name === 'firstClue')) {
+            isClueTargeted = true;
+            break;
+        }
+    }
+    
+    // Log when targeting state changes
+    if (isClueTargeted !== wasTargeted) {
+        console.log(isClueTargeted ? 'Clue targeted!' : 'Clue no longer targeted');
+        
+        // Update visual feedback
+        updateClueAppearance();
+    }
+}
+
+// Function to update clue appearance based on targeting
+function updateClueAppearance() {
+    if (isClueTargeted) {
+        // Make the clue more noticeable when targeted
+        clueMaterial.color.set(0xff0000); // Bright red
+        clueMaterial.opacity = 0.9;
+    } else {
+        // Return to normal appearance
+        clueMaterial.color.set(0x00ff00); // Green
+        clueMaterial.opacity = 0.8;
     }
 }
 
