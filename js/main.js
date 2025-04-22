@@ -68,6 +68,28 @@ clueObject.position.set(10, 2, -5);
 // Add clue to scene
 scene.add(clueObject);
 
+// Create barrier object to block an area
+const barrierGeometry = new THREE.BoxGeometry(10, 5, 1);
+const barrierMaterial = new THREE.MeshBasicMaterial({ 
+    color: 0x3333ff,
+    transparent: true,
+    opacity: 0.7 
+});
+const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+
+// Position barrier to block an area
+barrier.position.set(15, 2.5, 15);
+barrier.name = 'accessBarrier';
+
+// Add barrier to scene
+scene.add(barrier);
+
+// Track barrier state
+const barrierState = {
+    active: true,
+    originalPosition: barrier.position.clone()
+};
+
 // Create camera with perspective projection
 const camera = new THREE.PerspectiveCamera(
     75, // Field of view
@@ -125,6 +147,8 @@ function updateDebugOverlay() {
     D: ${keysPressed.d}
     Position: ${camera.position.toArray().map(n => n.toFixed(2))}
     Clue Targeted: ${isClueTargeted}
+    Photo Ready: ${photoActionReady}
+    Clue Captured: ${cluePhotographed}
     Intersections: ${intersects.length}
     `;
 }
@@ -506,13 +530,18 @@ function triggerClueReaction() {
             
             // Display success message
             showCaptureMessage('Clue captured!');
+            
+            // Deactivate barrier after a delay
+            setTimeout(() => {
+                deactivateBarrier();
+            }, 1000);
         }
     }
     
     animateClueReaction();
 }
 
-// Show capture success message
+// Function to show capture success message
 function showCaptureMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.style.position = 'fixed';
@@ -537,6 +566,44 @@ function showCaptureMessage(message) {
             document.body.removeChild(messageElement);
         }, 1000);
     }, 3000);
+}
+
+// Function to deactivate barrier
+function deactivateBarrier() {
+    if (!barrierState.active) return; // Already deactivated
+    
+    barrierState.active = false;
+    
+    // Animate barrier removal
+    const duration = 1500; // ms
+    const startTime = Date.now();
+    const startY = barrier.position.y;
+    const targetY = -5; // Move below ground
+    
+    function animateBarrier() {
+        const elapsed = Date.now() - startTime;
+        
+        if (elapsed < duration) {
+            const progress = elapsed / duration;
+            
+            // Move barrier downward
+            barrier.position.y = startY - (startY - targetY) * progress;
+            
+            // Make it fade out
+            barrierMaterial.opacity = 0.7 * (1 - progress);
+            
+            requestAnimationFrame(animateBarrier);
+        } else {
+            // Animation complete
+            barrier.position.y = targetY;
+            barrierMaterial.opacity = 0;
+            
+            // Show message about new area
+            showCaptureMessage('New area unlocked!');
+        }
+    }
+    
+    animateBarrier();
 }
 
 // Animation loop

@@ -9,10 +9,10 @@
 **Constraints:** Raycasting should be performed periodically or on specific events.
 
 **Acceptance Criteria:**
-*   [ ] A THREE.Raycaster instance is created
-*   [ ] Raycasting is performed from the camera's position and direction
-*   [ ] The code correctly identifies when the ray intersects the 'clue' object
-*   [ ] (Optional) Visual feedback indicates when the clue is targeted
+*   [x] A THREE.Raycaster instance is created
+*   [x] Raycasting is performed from the camera's position and direction
+*   [x] The code correctly identifies when the ray intersects the 'clue' object
+*   [x] (Optional) Visual feedback indicates when the clue is targeted
 
 **Tasks:**
 - [Implement Raycasting](tasks/e001f004s010t033_implement_raycasting.md)

@@ -9,9 +9,9 @@
 **Constraints:** The trigger action should be distinct from movement (e.g., left mouse click).
 
 **Acceptance Criteria:**
-*   [ ] Clicking the left mouse button triggers an event check
-*   [ ] If the clue is currently targeted when clicked, a specific function is called
-*   [ ] The reaction function modifies the environment in some way
+*   [x] Clicking the left mouse button triggers an event check
+*   [x] If the clue is currently targeted when clicked, a specific function is called
+*   [x] The reaction function modifies the environment in some way
 
 **Tasks:**
 - [Add Photo Action Listener](tasks/e001f004s011t037_add_photo_action.md)

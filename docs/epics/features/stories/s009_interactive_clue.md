@@ -9,10 +9,10 @@
 **Constraints:** Place it within the area accessible with basic movement. Give it a unique name or property for identification.
 
 **Acceptance Criteria:**
-*   [ ] A new Mesh object representing the clue is added to the scene
-*   [ ] The clue object has a material/color that makes it easily distinguishable
-*   [ ] The clue object is positioned within the initial walkable area
-*   [ ] The clue object has a property to identify it programmatically
+*   [x] A new Mesh object representing the clue is added to the scene
+*   [x] The clue object has a material/color that makes it easily distinguishable
+*   [x] The clue object is positioned within the initial walkable area
+*   [x] The clue object has a property to identify it programmatically
 
 **Tasks:**
 - [Create Clue Geometry](tasks/e001f004s009t031_create_clue_geometry.md)
