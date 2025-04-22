@@ -1,6 +1,21 @@
 // Initialize core Three.js components
 const scene = new THREE.Scene();
 
+// Set up error handling
+const errorLog = [];
+window.addEventListener('error', function(event) {
+    console.error('Error caught:', event.error);
+    
+    // Add to error log (limit size to prevent overflow)
+    if (errorLog.length > 5) errorLog.shift();
+    errorLog.push(`${new Date().toLocaleTimeString()}: ${event.error.message}`);
+    
+    // Update debug overlay to show error
+    if (typeof updateDebugOverlay === 'function') {
+        updateDebugOverlay();
+    }
+});
+
 // Add debug helpers
 const gridHelper = new THREE.GridHelper(100, 20);
 scene.add(gridHelper);
@@ -149,7 +164,9 @@ function updateDebugOverlay() {
     Clue Targeted: ${isClueTargeted}
     Photo Ready: ${photoActionReady}
     Clue Captured: ${cluePhotographed}
+    Barrier Active: ${barrierState.active}
     Intersections: ${intersects.length}
+    Errors: ${errorLog.join('\n')}
     `;
 }
 
