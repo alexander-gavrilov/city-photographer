@@ -1,37 +1,12 @@
 // Initialize core Three.js components
 const scene = new THREE.Scene();
 
-// Debug settings
-const debugControls = {
-    moveSpeed: 0.1,
-    showHelpers: true,
-    logMovement: true
-};
+// Add debug helpers
+const gridHelper = new THREE.GridHelper(100, 20);
+scene.add(gridHelper);
 
-// Debug GUI
-const gui = new dat.GUI();
-const movementFolder = gui.addFolder('Movement Controls');
-movementFolder.add(debugControls, 'moveSpeed', 0.01, 1.0).name('Move Speed');
-movementFolder.add(debugControls, 'showHelpers').name('Show Debug Helpers');
-movementFolder.add(debugControls, 'logMovement').name('Log Movement');
-
-const positionFolder = gui.addFolder('Camera Position');
-positionFolder.add(camera.position, 'x').listen();
-positionFolder.add(camera.position, 'y').listen();
-positionFolder.add(camera.position, 'z').listen();
-
-// Debug helpers
-const debugHelpers = {
-    axes: new THREE.AxesHelper(5),
-    directionArrow: new THREE.ArrowHelper(
-        new THREE.Vector3(0, 0, -1),
-        new THREE.Vector3(0, 0, 0),
-        3,
-        0xffff00
-    )
-};
-scene.add(debugHelpers.axes);
-scene.add(debugHelpers.directionArrow);
+const axesHelper = new THREE.AxesHelper(5);
+scene.add(axesHelper);
 
 // Create ground plane
 const groundGeometry = new THREE.PlaneGeometry(100, 100);
@@ -58,11 +33,12 @@ function createBuilding(width, height, depth, x, z, materialIndex) {
     const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
     const material = buildingMaterials[materialIndex % buildingMaterials.length];
     const building = new THREE.Mesh(buildingGeometry, material);
-    building.position.set(x, height/2, z);
+    building.position.set(x, height/2, z);  // y position is half height to sit on ground
     building.name = `building_${x}_${z}`;
     return building;
 }
 
+// Add multiple buildings of different sizes with different materials
 const buildings = [
     createBuilding(10, 20, 10, -20, -15, 0),  // Tall building on the left
     createBuilding(15, 15, 15, 20, -20, 1),   // Medium building on the right
@@ -71,9 +47,10 @@ const buildings = [
     createBuilding(20, 30, 20, 0, -30, 4)     // Large central building
 ];
 
+// Add all buildings to the scene
 buildings.forEach(building => scene.add(building));
 
-// Create camera
+// Create camera with perspective projection
 const camera = new THREE.PerspectiveCamera(
     75, // Field of view
     window.innerWidth / window.innerHeight,
@@ -93,6 +70,16 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 
+// Make canvas focusable for keyboard events
+const canvas = renderer.domElement;
+canvas.setAttribute('tabindex', '0');
+canvas.focus();
+canvas.addEventListener('blur', () => {
+    // Reset key states when canvas loses focus
+    Object.keys(keysPressed).forEach(key => keysPressed[key] = false);
+    updateDebugOverlay();
+});
+
 // Handle window resizing
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -100,12 +87,27 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Debug logging
-const debugLog = {
-    keyEvent: (type, key, state) => console.log(`[Key ${type}] ${key}:`, state),
-    movement: (direction, velocity) => console.log(`[Movement] ${direction}:`, velocity.toArray()),
-    position: (pos) => console.log('[Position]', pos.toArray())
-};
+// Debug overlay
+const debugOverlay = document.createElement('div');
+debugOverlay.style.position = 'fixed';
+debugOverlay.style.top = '10px';
+debugOverlay.style.left = '10px';
+debugOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+debugOverlay.style.color = 'white';
+debugOverlay.style.padding = '10px';
+debugOverlay.style.fontFamily = 'monospace';
+document.body.appendChild(debugOverlay);
+
+function updateDebugOverlay() {
+    debugOverlay.textContent = `
+    Keys Pressed:
+    W: ${keysPressed.w}
+    A: ${keysPressed.a}
+    S: ${keysPressed.s}
+    D: ${keysPressed.d}
+    Position: ${camera.position.toArray().map(n => n.toFixed(2))}
+    `;
+}
 
 // Keyboard movement controls
 const keysPressed = {
@@ -115,6 +117,7 @@ const keysPressed = {
     d: false
 };
 
+const moveSpeed = 0.1;
 const direction = new THREE.Vector3();
 const sideVector = new THREE.Vector3();
 
@@ -123,10 +126,7 @@ function handleKeyDown(event) {
     if (keysPressed.hasOwnProperty(key)) {
         event.preventDefault();
         keysPressed[key] = true;
-        debugLog.keyEvent('pressed', key, keysPressed);
-        
-        // Update direction arrow color to indicate movement
-        debugHelpers.directionArrow.setColor(0xff0000);
+        debugOverlay.textContent = `Last key pressed: ${key}\n${debugOverlay.textContent}`;
     }
 }
 
@@ -135,51 +135,45 @@ function handleKeyUp(event) {
     if (keysPressed.hasOwnProperty(key)) {
         event.preventDefault();
         keysPressed[key] = false;
-        debugLog.keyEvent('released', key, keysPressed);
-        
-        // Reset direction arrow color
-        debugHelpers.directionArrow.setColor(0xffff00);
+        console.log('Key released:', key, keysPressed);
     }
 }
 
 function updateMovement() {
     if (!Object.values(keysPressed).some(Boolean)) return;
     
-    // Update movement vectors
+    // Get forward direction from camera's rotation
     direction.set(0, 0, -1).applyQuaternion(camera.quaternion);
-    direction.y = 0;
+    direction.y = 0; // Keep movement horizontal
     direction.normalize();
     
+    // Get side direction for strafing
     sideVector.set(1, 0, 0).applyQuaternion(camera.quaternion);
     sideVector.normalize();
     
-    // Calculate velocity
-    const velocity = new THREE.Vector3(0, 0, 0);
+    // Calculate movement
+    const movement = new THREE.Vector3(0, 0, 0);
     
     if (keysPressed.w) {
-        velocity.add(direction.clone().multiplyScalar(debugControls.moveSpeed));
-        debugLog.movement('forward', velocity);
+        movement.add(direction.clone().multiplyScalar(moveSpeed));
+        console.log('Moving forward', movement.toArray());
     }
     if (keysPressed.s) {
-        velocity.sub(direction.clone().multiplyScalar(debugControls.moveSpeed));
-        debugLog.movement('backward', velocity);
+        movement.sub(direction.clone().multiplyScalar(moveSpeed));
+        console.log('Moving backward', movement.toArray());
     }
     if (keysPressed.a) {
-        velocity.sub(sideVector.clone().multiplyScalar(debugControls.moveSpeed));
-        debugLog.movement('left', velocity);
+        movement.sub(sideVector.clone().multiplyScalar(moveSpeed));
+        console.log('Moving left', movement.toArray());
     }
     if (keysPressed.d) {
-        velocity.add(sideVector.clone().multiplyScalar(debugControls.moveSpeed));
-        debugLog.movement('right', velocity);
+        movement.add(sideVector.clone().multiplyScalar(moveSpeed));
+        console.log('Moving right', movement.toArray());
     }
     
     // Apply movement
-    camera.position.add(velocity);
-    debugLog.position(camera.position);
-    
-    // Update debug direction arrow
-    debugHelpers.directionArrow.position.copy(camera.position);
-    debugHelpers.directionArrow.setDirection(direction);
+    camera.position.add(movement);
+    console.log('Camera position:', camera.position.toArray());
 }
 
 // Add keyboard listeners
@@ -187,16 +181,12 @@ window.addEventListener('keydown', handleKeyDown);
 window.addEventListener('keyup', handleKeyUp);
 
 // Animation loop
-let lastTime = 0;
-function animate(time) {
+function animate() {
     requestAnimationFrame(animate);
-    
-    const deltaTime = time - lastTime;
-    lastTime = time;
-    
     updateMovement();
+    updateDebugOverlay();
     renderer.render(scene, camera);
 }
 
 // Start the animation loop
-animate(0);
+animate();
