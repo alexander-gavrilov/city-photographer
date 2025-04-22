@@ -50,6 +50,24 @@ const buildings = [
 // Add all buildings to the scene
 buildings.forEach(building => scene.add(building));
 
+// Create interactive clue object
+const clueGeometry = new THREE.SphereGeometry(1, 32, 32);
+const clueMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ff00, // Bright green
+    transparent: true,
+    opacity: 0.8
+});
+
+// Create the clue mesh
+const clueObject = new THREE.Mesh(clueGeometry, clueMaterial);
+clueObject.name = 'firstClue';
+
+// Position the clue at eye level near one of the buildings
+clueObject.position.set(10, 2, -5);
+
+// Add clue to scene
+scene.add(clueObject);
+
 // Create camera with perspective projection
 const camera = new THREE.PerspectiveCamera(
     75, // Field of view
@@ -308,6 +326,10 @@ function animate() {
     requestAnimationFrame(animate);
     updateMovement();
     updateCameraRotation();
+    
+    // Animate clue with gentle floating motion
+    clueObject.position.y = 2 + Math.sin(Date.now() * 0.001) * 0.2;
+    
     updateDebugOverlay();
     renderer.render(scene, camera);
 }

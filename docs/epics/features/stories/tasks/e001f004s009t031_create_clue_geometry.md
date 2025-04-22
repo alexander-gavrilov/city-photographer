@@ -6,7 +6,7 @@
 
 **Requirements:** Create a unique geometry and material that stands out from buildings.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] A distinctive geometry is created (e.g., sphere, torus)

@@ -6,7 +6,7 @@
 
 **Requirements:** Place the clue where it's visible and reachable by the player.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Clue is positioned within the walkable area
