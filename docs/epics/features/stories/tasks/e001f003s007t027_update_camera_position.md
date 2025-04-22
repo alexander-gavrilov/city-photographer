@@ -6,7 +6,7 @@
 
 **Requirements:** Move camera based on WASD input relative to its current rotation.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Camera moves forward when W is pressed

@@ -6,7 +6,7 @@
 
 **Requirements:** Add event listeners for keydown and keyup events.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] keydown event listener is added to window

@@ -6,7 +6,7 @@
 
 **Requirements:** Use a data structure to track the state of W, S, A, D keys.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Data structure exists to track key states
