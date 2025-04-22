@@ -6,7 +6,7 @@
 
 **Requirements:** Track mouse movement deltas using either movementX/Y or manual calculation.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Mouse movement delta is calculated correctly

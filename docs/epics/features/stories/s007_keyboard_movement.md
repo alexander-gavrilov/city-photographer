@@ -9,11 +9,11 @@
 **Constraints:** Movement should be relative to the camera's current facing direction.
 
 **Acceptance Criteria:**
-*   [ ] Pressing W moves the camera forward relative to its facing direction
-*   [ ] Pressing S moves the camera backward relative to its facing direction
-*   [ ] Pressing A moves the camera left relative to its facing direction
-*   [ ] Pressing D moves the camera right relative to its facing direction
-*   [ ] Holding down a key results in continuous movement
+*   [x] Pressing W moves the camera forward relative to its facing direction
+*   [x] Pressing S moves the camera backward relative to its facing direction
+*   [x] Pressing A moves the camera left relative to its facing direction
+*   [x] Pressing D moves the camera right relative to its facing direction
+*   [x] Holding down a key results in continuous movement
 
 **Tasks:**
 - [Add Keyboard Listeners](tasks/e001f003s007t025_add_keyboard_listeners.md)

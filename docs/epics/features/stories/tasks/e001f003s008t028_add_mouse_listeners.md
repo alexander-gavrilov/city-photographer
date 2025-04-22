@@ -6,7 +6,7 @@
 
 **Requirements:** Add mousemove event listener and optionally implement pointer lock.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] mousemove event listener is added to document/canvas

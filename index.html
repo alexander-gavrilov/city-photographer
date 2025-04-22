@@ -19,7 +19,22 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <div id="instructions">Click to play<br>WASD or Arrow Keys to move</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/dat.gui.module.js"></script>
     <script src="js/main.js"></script>
+    <style>
+        #instructions {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            z-index: 100;
+            cursor: pointer;
+        }
+    </style>
 </body>
 </html>

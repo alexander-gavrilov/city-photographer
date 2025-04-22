@@ -9,10 +9,10 @@
 **Constraints:** Vertical look (pitch) should be clamped to prevent the camera from flipping upside down.
 
 **Acceptance Criteria:**
-*   [ ] Moving the mouse horizontally rotates the camera around the Y-axis
-*   [ ] Moving the mouse vertically rotates the camera around its local X-axis
-*   [ ] Vertical rotation is limited to a reasonable range (e.g., -90 to +90 degrees)
-*   [ ] (Optional) Mouse cursor is hidden and captured by the browser window
+*   [x] Moving the mouse horizontally rotates the camera around the Y-axis
+*   [x] Moving the mouse vertically rotates the camera around its local X-axis
+*   [x] Vertical rotation is limited to a reasonable range (e.g., -90 to +90 degrees)
+*   [x] (Optional) Mouse cursor is hidden and captured by the browser window
 
 **Tasks:**
 - [Add Mouse Listeners](tasks/e001f003s008t028_add_mouse_listeners.md)

@@ -6,7 +6,7 @@
 
 **Requirements:** Apply yaw and pitch rotations with vertical angle limits.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Horizontal mouse movement rotates camera left/right (yaw)

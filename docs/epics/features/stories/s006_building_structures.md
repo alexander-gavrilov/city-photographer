@@ -19,3 +19,5 @@
 - [Create Building Meshes](tasks/e001f002s006t022_create_building_mesh.md)
 - [Position Buildings](tasks/e001f002s006t023_position_buildings.md)
 - [Add Buildings to Scene](tasks/e001f002s006t024_add_buildings_to_scene.md)
+- [Add Lighting](tasks/e001f002s006t042_add_lighting.md)
+- [Add Debug Helpers](tasks/e001f002s006t043_add_debug_helpers.md)
