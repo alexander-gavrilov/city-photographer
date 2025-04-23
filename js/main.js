@@ -1,6 +1,16 @@
 // Initialize core Three.js components
 const scene = new THREE.Scene();
 
+// Add ambient light to the scene
+const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Soft white light
+scene.add(ambientLight);
+
+// Add directional light (simulates sun)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 10, 7);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
+
 // Set up error handling
 const errorLog = [];
 window.addEventListener('error', function(event) {
@@ -35,35 +45,18 @@ ground.rotation.x = -Math.PI / 2;
 // Add ground to scene
 scene.add(ground);
 
-// Create buildings
-const buildingMaterials = [
-    new THREE.MeshBasicMaterial({ color: 0x808080 }), // Gray
-    new THREE.MeshBasicMaterial({ color: 0xa52a2a }), // Brown
-    new THREE.MeshBasicMaterial({ color: 0x696969 }), // Dim Gray
-    new THREE.MeshBasicMaterial({ color: 0x556b2f }), // Dark Olive Green
-    new THREE.MeshBasicMaterial({ color: 0x2f4f4f })  // Dark Slate Gray
-];
+// Initialize city districts with buildings and landmarks
+console.log("Initializing city districts...");
 
-function createBuilding(width, height, depth, x, z, materialIndex) {
-    const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
-    const material = buildingMaterials[materialIndex % buildingMaterials.length];
-    const building = new THREE.Mesh(buildingGeometry, material);
-    building.position.set(x, height/2, z);  // y position is half height to sit on ground
-    building.name = `building_${x}_${z}`;
-    return building;
-}
+// Create districts and add buildings and landmarks
+const districts = initializeDistricts();
 
-// Add multiple buildings of different sizes with different materials
+// Store references to all buildings for later use if needed
 const buildings = [
-    createBuilding(10, 20, 10, -20, -15, 0),  // Tall building on the left
-    createBuilding(15, 15, 15, 20, -20, 1),   // Medium building on the right
-    createBuilding(8, 25, 8, -10, 10, 2),     // Skyscraper
-    createBuilding(12, 10, 12, 15, 15, 3),    // Shorter building
-    createBuilding(20, 30, 20, 0, -30, 4)     // Large central building
+    ...districts.downtownBuildings,
+    ...districts.industrialBuildings,
+    ...districts.residentialBuildings
 ];
-
-// Add all buildings to the scene
-buildings.forEach(building => scene.add(building));
 
 // Create interactive clue object
 const clueGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -623,6 +616,78 @@ function deactivateBarrier() {
     animateBarrier();
 }
 
+// Initialize district tracking variables
+let currentDistrict = null;
+const districtIndicator = document.getElementById('districtIndicator');
+const districtDescription = document.getElementById('districtDescription');
+let descriptionTimeout = null;
+
+// Update district indicator based on player position
+function updateDistrictIndicator() {
+    const playerPosition = camera.position.clone();
+    const district = getDistrictAtPosition(playerPosition);
+    
+    // Only update if district changed
+    if (district !== currentDistrict) {
+        // If we're entering a new district (not just leaving one)
+        if (district) {
+            // Show entrance notification
+            showDistrictEntrance(district);
+        }
+        
+        currentDistrict = district;
+        
+        // Update UI element
+        if (district) {
+            districtIndicator.textContent = `District: ${district.name}`;
+            
+            // Remove previous class
+            districtIndicator.classList.remove('district-downtown', 'district-industrial', 'district-residential');
+            
+            // Add appropriate class based on district
+            const districtClass = `district-${district.name.toLowerCase()}`;
+            districtIndicator.classList.add(districtClass);
+            
+            // Show district indicator
+            districtIndicator.style.display = 'block';
+        } else {
+            districtIndicator.textContent = 'District: Unknown';
+            districtIndicator.classList.remove('district-downtown', 'district-industrial', 'district-residential');
+            
+            // Hide district description when leaving all districts
+            hideDistrictDescription();
+        }
+    }
+}
+
+// Show district entrance notification with description
+function showDistrictEntrance(district) {
+    // Clear any existing timeout
+    if (descriptionTimeout) {
+        clearTimeout(descriptionTimeout);
+    }
+    
+    // Update description content
+    const titleElement = districtDescription.querySelector('h3');
+    const descriptionElement = districtDescription.querySelector('p');
+    
+    titleElement.textContent = district.name + " District";
+    descriptionElement.textContent = district.description;
+    
+    // Show description with animation
+    districtDescription.classList.add('visible');
+    
+    // Hide after 8 seconds
+    descriptionTimeout = setTimeout(() => {
+        hideDistrictDescription();
+    }, 8000);
+}
+
+// Hide district description
+function hideDistrictDescription() {
+    districtDescription.classList.remove('visible');
+}
+
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
@@ -635,6 +700,9 @@ function animate() {
     // Update raycasting and clue targeting
     updateRaycaster();
     checkClueIntersection();
+    
+    // Update district indicator
+    updateDistrictIndicator();
     
     // Update debug info
     updateDebugOverlay();
