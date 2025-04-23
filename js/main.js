@@ -1,6 +1,21 @@
 // Initialize core Three.js components
 const scene = new THREE.Scene();
 
+// Create debug overlay early to avoid initialization errors
+const debugOverlay = document.createElement('div');
+debugOverlay.style.position = 'fixed';
+debugOverlay.style.top = '10px';
+debugOverlay.style.left = '10px';
+debugOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+debugOverlay.style.color = 'white';
+debugOverlay.style.padding = '10px';
+debugOverlay.style.fontFamily = 'monospace';
+
+// Add debug overlay to DOM when body is available
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.appendChild(debugOverlay);
+});
+
 // Add ambient light to the scene
 const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Soft white light
 scene.add(ambientLight);
@@ -50,6 +65,38 @@ console.log("Initializing city districts...");
 
 // Create districts and add buildings and landmarks
 const districts = initializeDistricts();
+
+// Create the street system with error handling
+console.log("Creating street network...");
+try {
+    // Log the type of createStreetSystem to diagnose access issues
+    console.log("Type of createStreetSystem:", typeof createStreetSystem);
+    console.log("Type of window.createStreetSystem:", typeof window.createStreetSystem);
+    
+    // Make sure we wait for streets.js to be loaded
+    if (typeof createStreetSystem !== 'function') {
+        console.warn("createStreetSystem function not found, waiting for it to load...");
+        // Create a temporary placeholder to avoid errors
+        const tempGroup = new THREE.Group();
+        tempGroup.name = "street_system_placeholder";
+        scene.add(tempGroup);
+        
+        // Set up a small delay to try again when the function might be available
+        setTimeout(() => {
+            if (typeof createStreetSystem === 'function') {
+                console.log("createStreetSystem is now available, creating streets...");
+                scene.remove(scene.getObjectByName("street_system_placeholder"));
+                const streetSystem = createStreetSystem();
+                scene.add(streetSystem);
+            }
+        }, 500); // 500ms delay to ensure streets.js is loaded
+    } else {
+        const streetSystem = createStreetSystem();
+        scene.add(streetSystem);
+    }
+} catch (e) {
+    console.error("Error creating street system:", e);
+}
 
 // Store references to all buildings for later use if needed
 const buildings = [
@@ -125,7 +172,10 @@ canvas.focus();
 canvas.addEventListener('blur', () => {
     // Reset key states when canvas loses focus
     Object.keys(keysPressed).forEach(key => keysPressed[key] = false);
-    updateDebugOverlay();
+    // Only call updateDebugOverlay if it exists
+    if (typeof updateDebugOverlay === 'function' && debugOverlay) {
+        updateDebugOverlay();
+    }
 });
 
 // Handle window resizing
@@ -135,32 +185,41 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Debug overlay
-const debugOverlay = document.createElement('div');
-debugOverlay.style.position = 'fixed';
-debugOverlay.style.top = '10px';
-debugOverlay.style.left = '10px';
-debugOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-debugOverlay.style.color = 'white';
-debugOverlay.style.padding = '10px';
-debugOverlay.style.fontFamily = 'monospace';
-document.body.appendChild(debugOverlay);
+// Debug overlay already created at the top of the file
+// No need to create it again
 
 function updateDebugOverlay() {
-    debugOverlay.textContent = `
-    Keys Pressed:
-    W: ${keysPressed.w}
-    A: ${keysPressed.a}
-    S: ${keysPressed.s}
-    D: ${keysPressed.d}
-    Position: ${camera.position.toArray().map(n => n.toFixed(2))}
-    Clue Targeted: ${isClueTargeted}
-    Photo Ready: ${photoActionReady}
-    Clue Captured: ${cluePhotographed}
-    Barrier Active: ${barrierState.active}
-    Intersections: ${intersects.length}
-    Errors: ${errorLog.join('\n')}
-    `;
+    // Make sure debugOverlay exists and variables are initialized before accessing them
+    if (!debugOverlay) return;
+    
+    try {
+        // Only access properties if they're defined
+        const positionStr = camera && camera.position ? camera.position.toArray().map(n => n.toFixed(2)) : 'N/A';
+        const clueTargetStr = typeof isClueTargeted !== 'undefined' ? isClueTargeted : 'N/A';
+        const photoReadyStr = typeof photoActionReady !== 'undefined' ? photoActionReady : 'N/A';
+        const clueCapturedStr = typeof cluePhotographed !== 'undefined' ? cluePhotographed : 'N/A';
+        const barrierActiveStr = barrierState && typeof barrierState.active !== 'undefined' ? barrierState.active : 'N/A';
+        const intersectsStr = typeof intersects !== 'undefined' ? intersects.length : 'N/A';
+        const keysStr = keysPressed ? `W: ${keysPressed.w}\n    A: ${keysPressed.a}\n    S: ${keysPressed.s}\n    D: ${keysPressed.d}` : 'N/A';
+        
+        debugOverlay.textContent = `
+        Keys Pressed:
+        ${keysStr}
+        Position: ${positionStr}
+        Clue Targeted: ${clueTargetStr}
+        Photo Ready: ${photoReadyStr}
+        Clue Captured: ${clueCapturedStr}
+        Barrier Active: ${barrierActiveStr}
+        Intersections: ${intersectsStr}
+        Errors: ${errorLog.join('\n')}
+        `;
+    } catch (e) {
+        // If any errors occur during debug info generation, display a simplified version
+        console.warn('Error updating debug overlay:', e);
+        if (debugOverlay) {
+            debugOverlay.textContent = 'Debug overlay error: ' + e.message;
+        }
+    }
 }
 
 // Keyboard movement controls
@@ -199,7 +258,9 @@ function handleKeyDown(event) {
         
         // Log the key press
         console.log('Key down:', key);
-        debugOverlay.textContent = `Last key pressed: ${key}\n${debugOverlay.textContent}`;
+        if (debugOverlay) {
+            debugOverlay.textContent = `Last key pressed: ${key}\n${debugOverlay.textContent}`;
+        }
     }
 }
 
