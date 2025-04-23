@@ -6,7 +6,7 @@
 
 **Requirements:** Create 3D models of alleyways and paths with appropriate textures and a more intimate scale.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Secondary roads and narrow alleyways implemented throughout districts

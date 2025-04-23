@@ -6,7 +6,7 @@
 
 **Requirements:** Create 3D models of the main roads with appropriate textures and collision boundaries.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Main roads connecting all districts are implemented in 3D

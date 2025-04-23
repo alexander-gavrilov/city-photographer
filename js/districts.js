@@ -616,7 +616,7 @@ function createDowntownLandmark() {
     
     // Add emissive sphere as the light source
     const lightGeo = new THREE.SphereGeometry(2, 16, 16);
-    const lightMaterial = new THREE.MeshBasicMaterial({ 
+    const lightMaterial = new THREE.MeshStandardMaterial({ 
         color: 0xFFFFAA,
         emissive: 0xFFFF00,
         emissiveIntensity: 1

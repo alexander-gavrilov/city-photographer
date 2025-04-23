@@ -9,10 +9,10 @@
 **Constraints:** Streets should be wide enough for easy navigation but maintain the dense city feel.
 
 **Acceptance Criteria:**
-*   [ ] Main streets connecting all districts
-*   [ ] Alleyways and side paths for exploration
-*   [ ] Street props (lamps, signs) to enhance realism
-*   [ ] Visual guides to help with navigation
+*   [x] Main streets connecting all districts
+*   [x] Alleyways and side paths for exploration
+*   [x] Street props (lamps, signs) to enhance realism
+*   [x] Visual guides to help with navigation
 
 **Tasks:**
 - [Design Street Network](tasks/e002f005s014t050_design_street_network.md)

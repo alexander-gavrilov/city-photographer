@@ -6,7 +6,7 @@
 
 **Requirements:** Create a street network plan that provides logical connections between districts with a mix of main roads and smaller paths.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Street network design/diagram created

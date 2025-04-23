@@ -6,7 +6,7 @@
 
 **Requirements:** Create visual cues such as signs, landmarks, and lighting to guide players through the street network.
 
-**Status:** □ TODO
+**Status:** ✓ DONE
 
 **Acceptance Criteria:**
 - [ ] Street signs at major intersections
