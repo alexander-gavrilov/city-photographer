@@ -20,3 +20,5 @@
 - [Create District 2 Buildings](tasks/e002f005s013t047_create_district2_buildings.md)
 - [Create District 3 Buildings](tasks/e002f005s013t048_create_district3_buildings.md)
 - [Add District Landmarks](tasks/e002f005s013t049_add_district_landmarks.md)
+- [Enhance District Feedback](tasks/e002f005s013t050_enhance_district_feedback.md)
+- [Add District Descriptions](tasks/e002f005s013t051_add_district_descriptions.md)
